@@ -1,0 +1,10 @@
+import 'package:flutter/material.dart';
+
+class SignUp extends StatefulWidget {
+  Sign_Up({Key key}) : super(key: key);
+  @override
+  _SignUpState createState() => _SignUpState();
+}
+
+class _SignUpState extends State<SignUp> {
+}

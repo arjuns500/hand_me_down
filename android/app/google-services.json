@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "400999096322",
+    "firebase_url": "https://hand-me-down-837b6.firebaseio.com",
+    "project_id": "hand-me-down-837b6",
+    "storage_bucket": "hand-me-down-837b6.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:400999096322:android:261fcb1461d9d7e2c5871b",
+        "android_client_info": {
+          "package_name": "com.systemctl603.hand_me_down"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "400999096322-lms493vim6757u4mbr2pksj45f9ogcp5.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.systemctl603.hand_me_down",
+            "certificate_hash": "04c247b88acd2c2f0cf01473f03c40c372dad6c8"
+          }
+        },
+        {
+          "client_id": "400999096322-o562q8rjvt9a06v0ijeort3cb75upbn8.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyATmM2QYjoIEakarIiWX8XhzqCx7IKM3b0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "400999096322-o562q8rjvt9a06v0ijeort3cb75upbn8.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
