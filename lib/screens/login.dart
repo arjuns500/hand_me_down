@@ -1,6 +1,13 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
+/// A screen for the user to login.
+/// Uses `google_sign_in` package to sign in
+/// with google auth.
+/// After signing in, starts a listener
+/// for auth changes, and navigates
+/// to the home screen.
 class Login extends StatefulWidget {
   Login({Key key}) : super(key: key);
 
@@ -9,61 +16,42 @@ class Login extends StatefulWidget {
 }
 
 class _LoginState extends State<Login> {
-  /// Key for the form, which allows us to
-  /// verify and sign in with the credentials
-  final _formKey = GlobalKey<FormState>();
-
-  /// Instance of [FirebaseFirestore]
-  final _db = FirebaseFirestore.instance;
-
   @override
   Widget build(BuildContext context) {
-    /// Reference for the `users` collection,
-    /// So we can add users and sign them in.
-    CollectionReference users = _db.collection("users");
+    Future<UserCredential> signIn() async {
+      // Initiate the login
+      final GoogleSignInAccount user = await GoogleSignIn().signIn();
+      if (user == null) {
+        return null;
+      }
+      final GoogleSignInAuthentication googleAuth = await user.authentication;
+      final GoogleAuthCredential cred = GoogleAuthProvider.credential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
+
+      return await FirebaseAuth.instance.signInWithCredential(cred);
+    }
 
     return Scaffold(
-      appBar: AppBar(title: Text("Login")),
+      appBar: AppBar(
+        title: Text("Login"),
+      ),
       body: Center(
-        child: Form(
-          key: _formKey,
-          child: Column(
-            children: [
-              TextFormField(
-                validator: (val) {
-                  if (val.isEmpty) {
-                    return "Field is empty";
-                  }
-                  return null;
-                },
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(),
-                  labelText: 'Email',
-                ),
-              ),
-              TextFormField(
-                validator: (val) {
-                  if (val.isEmpty) {
-                    return "Field is empty";
-                  }
-                  return null;
-                },
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(),
-                ),
-              ),
-              ElevatedButton(
-                onPressed: () {
-                  if (_formKey.currentState.validate()) {}
-                },
-                child: Text('Submit'),
-              ),
-              ElevatedButton(
-                onPressed: () {},
-                child: Text('Submit'),
-              ),
-            ],
-          ),
+        child: RaisedButton(
+          onPressed: () async {
+            try {
+              UserCredential user = await signIn();
+              if (user == null)
+                print("Sign in cancelled");
+              else {
+                Navigator.pushReplacementNamed(context, '/home');
+              }
+            } catch (e) {
+              print(e);
+            }
+          },
+          child: Text('Sign in with Google'),
         ),
       ),
     );
