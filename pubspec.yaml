@@ -25,13 +25,30 @@ dependencies:
     sdk: flutter
   firebase_core: ^0.5.2
   cloud_firestore: ^0.14.3
+
+  # Used for auth
   firebase_auth: ^0.18.3
   google_sign_in: ^4.5.1
+
+  # Provides slideable to use in swiping
+  flutter_slidable: ^0.5.7
+
+  # Used for location queries in flutter
+  geoflutterfire: ^2.2.1
+  location: ^3.0.0
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.0
 
+flutter_icons:
+  android: true
+  ios: true
+  adaptive_icon_background: "assets/adaptive_bg.png"
+  adaptive_icon_foreground: "assets/adaptive_fg.png"
+  image_path: "assets/icon.png"
+
 dev_dependencies:
+  flutter_launcher_icons: "^0.8.0"
   flutter_test:
     sdk: flutter
 

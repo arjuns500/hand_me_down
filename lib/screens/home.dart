@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:geoflutterfire/geoflutterfire.dart';
+import 'package:location/location.dart';
+import 'package:hand_me_down/components/Requests.dart';
+import 'package:hand_me_down/components/Search.dart';
 
 class Home extends StatefulWidget {
   Home({Key key}) : super(key: key);
@@ -15,7 +19,17 @@ class _HomeState extends State<Home> {
   final CollectionReference requests =
       FirebaseFirestore.instance.collection("requests");
 
+  final CollectionReference notifications =
+      FirebaseFirestore.instance.collection("all_notifications");
+
+  final auth = FirebaseAuth.instance;
+
+  final geo = Geoflutterfire();
+
   String itemRequested = "";
+  List listOfRequests;
+  List searchResults;
+  GeoFirePoint position;
 
   void _onBottomNavTapped(int i) {
     setState(() {
@@ -23,80 +37,112 @@ class _HomeState extends State<Home> {
     });
   }
 
-  final List<Widget> _children = [
-    Column(
-      children: <Widget>[
-        // ListView.builder(
-        //   itemBuilder: (context, int i) {
-        //     return Card(
-        //       child: Column(
-        //         mainAxisSize: MainAxisSize.min,
-        //         children: [
-        //           ListTile(
-        //             title: Text(),
-        //           ),
-        //         ],
-        //       ),
-        //     );
-        //   },
-        // )
-      ],
-    ),
-    Text("TBD"),
-  ];
+  @override
+  void initState() {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      Location location = new Location();
+
+      bool _serviceEnabled;
+      PermissionStatus _permissionGranted;
+
+      _serviceEnabled = await location.serviceEnabled();
+      if (!_serviceEnabled) {
+        _serviceEnabled = await location.requestService();
+        if (!_serviceEnabled) {
+          return;
+        }
+      }
+
+      _permissionGranted = await location.hasPermission();
+      if (_permissionGranted == PermissionStatus.denied) {
+        _permissionGranted = await location.requestPermission();
+        if (_permissionGranted != PermissionStatus.granted) {
+          return;
+        }
+      }
+      var pos = await location.getLocation();
+      GeoFirePoint point =
+          geo.point(latitude: pos.latitude, longitude: pos.longitude);
+      setState(() => position = point);
+    });
+
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
+    /// List of widgets
+    /// The bottom tab navigator uses this list
+    /// to navigate between the [Requests] and [Search] screens.
+    final List<Widget> _children = [
+      Requests(),
+      Search(),
+    ];
     return Scaffold(
-      floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          String itemWanted = "";
-          await showDialog(
-            context: context,
-            child: AlertDialog(
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  TextField(
-                    onChanged: (String value) {
-                      itemWanted = value;
-                    },
-                    decoration: InputDecoration(
-                      border: OutlineInputBorder(),
-                      labelText: "Item you need",
-                    ),
-                  ),
-                  ElevatedButton(
-                    onPressed: () {
-                      requests.add({
-                        'objectWanted': itemWanted,
-                        'interested': null,
-                        'requestedBy': FirebaseAuth.instance.currentUser.email,
-                      });
-                      Navigator.pop(context);
-                    },
-                    child: Text("Submit"),
-                  ),
-                ],
-              ),
-            ),
-          );
-        },
-        child: Icon(Icons.add),
-      ),
       appBar: AppBar(
         title: Text("Home"),
         actions: [
           IconButton(
+              icon: Icon(Icons.add),
+              onPressed: () async {
+                String itemWanted = "";
+                await showDialog(
+                  context: context,
+                  child: AlertDialog(
+                    title: Text("Request object"),
+                    content: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        TextField(
+                          onChanged: (String value) {
+                            itemWanted = value;
+                          },
+                          decoration:
+                              InputDecoration(labelText: "Item you need"),
+                        ),
+                      ],
+                    ),
+                    actions: [
+                      TextButton(
+                        onPressed: () {
+                          /// Here an object is added to the database
+                          /// interested is set to null by default
+                          /// so it is easy to query for requests
+                          /// that haven't been donated to yet
+                          requests.add({
+                            'objectWanted': itemWanted,
+                            'interested': null,
+                            'requestedBy': auth.currentUser?.email,
+                            'position': position.data,
+                          });
+                          Navigator.pop(context);
+                        },
+                        child: Text("Submit"),
+                      ),
+                    ],
+                  ),
+                );
+              }),
+          IconButton(
             icon: Icon(Icons.logout),
+            onPressed: () async {
+              await auth.signOut();
+              Navigator.pushNamedAndRemoveUntil(context, '/', (route) => false);
+            },
+          ),
+          IconButton(
+            icon: Icon(Icons.notifications),
             onPressed: () {
-              FirebaseAuth.instance.signOut();
-              Navigator.pushReplacementNamed(context, '/');
+              Navigator.pushNamed(context, '/notifs');
             },
           ),
         ],
       ),
       body: _children[_selIndex],
       bottomNavigationBar: BottomNavigationBar(
+        /// The bottom navigation bar
+        /// shows the options of creating requests
+        /// and fullfilling them.
         items: <BottomNavigationBarItem>[
           BottomNavigationBarItem(
             icon: Icon(Icons.account_circle),
