@@ -2,9 +2,12 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:geoflutterfire/geoflutterfire.dart';
-import 'package:location/location.dart';
 
 class Search extends StatefulWidget {
+  final GeoFirePoint position;
+
+  const Search({Key key, @required this.position}) : super(key: key);
+
   @override
   _SearchState createState() => _SearchState();
 }
@@ -21,39 +24,6 @@ class _SearchState extends State<Search> {
   final TextEditingController _searchController = TextEditingController();
 
   double _radius = 1;
-  GeoFirePoint position;
-
-  @override
-  void initState() {
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      Location location = new Location();
-
-      bool _serviceEnabled;
-      PermissionStatus _permissionGranted;
-
-      _serviceEnabled = await location.serviceEnabled();
-      if (!_serviceEnabled) {
-        _serviceEnabled = await location.requestService();
-        if (!_serviceEnabled) {
-          return;
-        }
-      }
-
-      _permissionGranted = await location.hasPermission();
-      if (_permissionGranted == PermissionStatus.denied) {
-        _permissionGranted = await location.requestPermission();
-        if (_permissionGranted != PermissionStatus.granted) {
-          return;
-        }
-      }
-      var pos = await location.getLocation();
-      GeoFirePoint point =
-          geo.point(latitude: pos.latitude, longitude: pos.longitude);
-      print(pos);
-      setState(() => position = point);
-    });
-    super.initState();
-  }
 
   void _searchRequests(String query) async {
     if (query == "") {
@@ -62,7 +32,7 @@ class _SearchState extends State<Search> {
       geo
           .collection(collectionRef: requests)
           .within(
-            center: position,
+            center: widget.position,
             radius: _radius,
             field: 'position',
           )
@@ -158,6 +128,7 @@ class _SearchState extends State<Search> {
                                                   FieldValue.serverTimestamp()
                                             });
                                             Navigator.of(context).pop();
+                                            _searchRequests("");
                                           }),
                                       RaisedButton(
                                           child: Text("No"),

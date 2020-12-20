@@ -57,7 +57,32 @@ class _HomeState extends State<Home> {
       if (_permissionGranted == PermissionStatus.denied) {
         _permissionGranted = await location.requestPermission();
         if (_permissionGranted != PermissionStatus.granted) {
-          return;
+          await showDialog(
+              context: context,
+              barrierDismissible: false,
+              builder: (BuildContext context) {
+                return AlertDialog(
+                  title: Text("Location Permission"),
+                  content: Text(
+                      "Location is needed to use this app. Please reconsider allowing this permission"),
+                  actions: [
+                    FlatButton(
+                      child: Text("Allow"),
+                      onPressed: () async {
+                        _permissionGranted = await location.requestPermission();
+                        if (_permissionGranted != PermissionStatus.granted)
+                          Navigator.pushNamedAndRemoveUntil(
+                              context, '/', (route) => false);
+                      },
+                    ),
+                    FlatButton(
+                      child: Text("Cancel"),
+                      onPressed: () => Navigator.pushNamedAndRemoveUntil(
+                          context, '/', (route) => false),
+                    ),
+                  ],
+                );
+              });
         }
       }
       var pos = await location.getLocation();
@@ -76,7 +101,7 @@ class _HomeState extends State<Home> {
     /// to navigate between the [Requests] and [Search] screens.
     final List<Widget> _children = [
       Requests(),
-      Search(),
+      Search(position: position),
     ];
     return Scaffold(
       appBar: AppBar(
@@ -106,7 +131,7 @@ class _HomeState extends State<Home> {
                       TextButton(
                         onPressed: () {
                           /// Here an object is added to the database
-                          /// interested is set to null by default
+                          /// `interested` is set to null by default
                           /// so it is easy to query for requests
                           /// that haven't been donated to yet
                           requests.add({

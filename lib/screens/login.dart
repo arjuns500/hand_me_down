@@ -39,14 +39,34 @@ class _LoginState extends State<Login> {
       ),
       body: Center(
         child: RaisedButton(
-          onPressed: () async {
-            try {
-              UserCredential user = await signIn();
-              Navigator.pushReplacementNamed(context, '/home');
-              if (user == null) print("Sign in cancelled");
-            } catch (e) {
+          onPressed: () {
+            signIn().then((user) {
+              if (user != null)
+                Navigator.pushReplacementNamed(context, '/home');
+              else
+                print("Sign in Cancelled");
+            }).catchError((e) {
+              // show the dialog
+              showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  return AlertDialog(
+                    title: Text("Error"),
+                    content: Text("An unexpected error was encountered.\n\n$e"),
+                    actions: [
+                      FlatButton(
+                        child: Text("OK"),
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                      )
+                    ],
+                  );
+                },
+              );
+
               print(e);
-            }
+            });
           },
           child: Text('Sign in with Google'),
         ),

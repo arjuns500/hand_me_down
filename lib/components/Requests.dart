@@ -39,12 +39,9 @@ class _RequestsState extends State<Requests> {
           snapshot.docs.map((doc) => {...doc.data(), 'id': doc.id}).toList();
 
       if (mounted)
-        setState(() {
-          listOfRequests = reqs;
-        });
-      else {
+        setState(() => listOfRequests = reqs);
+      else
         listOfRequests = reqs;
-      }
     });
 
     /// This section fetches the requests a user is interested
@@ -170,7 +167,6 @@ class _RequestsState extends State<Requests> {
                                     child: TextButton(
                                         child: Text("Send Message"),
                                         onPressed: () {
-                                          Navigator.of(menucontext).pop();
                                           TextEditingController
                                               _messageFieldController =
                                               TextEditingController();
@@ -210,6 +206,7 @@ class _RequestsState extends State<Requests> {
                                               );
                                             },
                                           );
+                                          Navigator.of(menucontext).pop();
                                         }),
                                   ),
                                   PopupMenuItem(
