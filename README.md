@@ -1,16 +1,13 @@
 # hand_me_down
 
-A new Flutter project.
+A flutter project.
 
-## Getting Started
+## Synopsis
+This project is meant for connecting people who have less opportunities and cannot get some object they need or want, and people who are fortunate enough to have the object, but have lost their use for it. This app also aims to reduce waste, as the latter person might give his book to someone instead of throwing it in a landfill. 
 
-This project is a starting point for a Flutter application.
+To download the apk file to install to your android phone:
+Go to [this link](https://github.com/systemctl603/hand_me_down/releases/tag/v1.0.0) and click on "app-release.apk".
+After this, transfer the file to your phone and install the apk.
+If you do not know how to install the apk, try following [this guide](https://www.lifewire.com/apk-file-4152929).
 
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
-
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+As for the code, It is written in Dart, with Flutter as the framework.
